@@ -1,0 +1,85 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Allow pacman without using password
+      copy:
+        content: "{{user}} ALL=(ALL) NOPASSWD: /usr/bin/pacman\n"
+        dest: "/etc/sudoers.d/{{user}}-allow-to-sudo-pacman"
+        force: no
+        group: root
+        owner: root
+        mode: 0555
+
+    - name: Add archlinux.fr repository to pacman
+      lineinfile:
+        dest: "/etc/pacman.conf"
+        state: "present"
+        line: "{{item}}"
+      with_items:
+        - "[archlinuxfr]"
+        - "SigLevel = Never"
+        - "Server = http://repo.archlinux.fr/$arch"
+
+    - name: Install base packages
+      pacman:
+        name: yay,vim,zsh,git
+        state: latest
+        update_cache: yes
+
+    - name: "Update existing packages (this can take a long time)"
+      become: true
+      become_user: "{{user}}"
+      shell: yay
+      register: debug
+    - debug: msg="{{ debug.stdout }}"
+
+    - name: Change shell for all users using bash to zsh
+      replace:
+        path: /etc/passwd
+        regexp: bash
+        replace: zsh
+
+    - name: Check if dotfiles are downloaded
+      stat: "path=/home/{{user}}/.dotfiles"
+      register: dotfiles
+
+    - name: Download dotfiles
+      become: true
+      become_user: "{{user}}"
+      when: not dotfiles.stat.exists
+      git:
+        repo: https://github.com/mykiwi/dotfiles
+        dest: "/home/{{user}}/.dotfiles"
+        recursive: true
+
+    - name: Install dotfiles
+      become: true
+      become_user: "{{user}}"
+      shell: ~/.dotfiles/install.sh
+      args:
+        chdir: ~/.dotfiles
+        creates: ~/.gitconfig
+
+    - name: "Install packages (this can take a long time)"
+      become: true
+      become_user: "{{user}}"
+      shell: >
+        yay -S --noconfirm --needed
+        docker
+        docker-compose
+        font-manager
+        all-repository-fonts
+        jetbrains-toolbox
+        visual-studio-code-bin
+        firefox-developer-edition
+        brave-bin
+        google-chrome
+        arc-icon-theme
+        arc-gtk-theme
+      register: debug
+    - debug: msg="{{ debug.stdout }}"
+
+    - name: Disable pacman without using password
+      file:
+        path: "/etc/sudoers.d/{{user}}-allow-to-sudo-pacman"
+        state: absent
