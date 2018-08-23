@@ -6,5 +6,6 @@ image: base/archlinux
 arch-setup:
   stage: verify
   script:
+    - pacman -Suy
     - pacman -S --noconfirm --needed git
     - curl -L git.io/mykiwi-arch-setup | sh
