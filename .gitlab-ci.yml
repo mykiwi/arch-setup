@@ -7,5 +7,5 @@ arch-setup:
   stage: verify
   script:
     - pacman -Suy
-    - pacman -S --noconfirm --needed git
+    - pacman -S --noconfirm --needed base-devel git
     - curl -L git.io/mykiwi-arch-setup | sh
