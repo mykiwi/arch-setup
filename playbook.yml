@@ -29,7 +29,7 @@
     - name: "Update existing packages (this can take a long time)"
       become: true
       become_user: "{{user}}"
-      shell: yay
+      shell: yay -Suy --noconfirm --needed
       register: debug
     - debug: msg="{{ debug.stdout }}"
 
