@@ -10,7 +10,7 @@ arch-setup:
     - pacman --noprogressbar --noconfirm -S -needed base-devel git sudo
     - groupadd sudo
     - useradd mykiwi --create-home
-    - echo "mykiwi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    - 'echo "mykiwi ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers'
     - su mykiwi
     - cd ~
     - git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noprogressbar --noconfirm
