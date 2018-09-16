@@ -60,22 +60,64 @@
         chdir: ~/.dotfiles
         creates: ~/.gitconfig
 
-    - name: "Install packages (this can take a long time)"
+    - name: "Install base packages (this can take a long time)"
       become: true
       become_user: "{{user}}"
       shell: >
         yay -S --noconfirm --needed
+        base-devel
+        blackfire-agent
+        blackfire-cli
+        composer
         docker
         docker-compose
-        font-manager
+        fzf
+        go
+        htop
+        hub
+        mongodb
+        nodejs
+        npm
+        php
+        php-apcu
+        php-blackfire
+        php-gd
+        php-intl
+        php-mcrypt
+        php-mongodb
+        php-redis
+        php-sqlite
+        redis
+        tmux
+        xdebug
+        yarn
+        zsh-completions
+      register: debug
+    - debug: msg="{{ debug.stdout }}"
+
+    - name: "Install graphic packages (this can take a long time)"
+      become: true
+      become_user: "{{user}}"
+      shell: >
+        yay -S --noconfirm --needed
         all-repository-fonts
-        jetbrains-toolbox
-        visual-studio-code-bin
-        firefox-developer-edition
         brave-bin
+        firefox-developer-edition
+        font-manager
         google-chrome
-        arc-icon-theme
-        arc-gtk-theme
+        i3-gaps
+        jetbrains-toolbox
+        mongodb-tools
+        neovim
+        redis-desktop-manager
+        spotify
+        ttf-dejavu
+        ttf-emojione-color
+        ttf-freefont
+        ttf-google-fonts-git
+        visual-studio-code-bin
+        vlc
+        wget
       register: debug
     - debug: msg="{{ debug.stdout }}"
 
